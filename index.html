@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WhatsApp Web</title>
+    <style>
+        body { font-family: sans-serif; margin: 0; background-color: #f0f2f5; }
+        .header { background-color: #075e54; color: white; padding: 15px; font-size: 20px; font-weight: bold; }
+        .content { padding: 20px; height: 70vh; }
+        .nav-bar { position: fixed; bottom: 0; width: 100%; display: flex; justify-content: space-around; background-color: white; padding: 10px 0; border-top: 1px solid #ddd; }
+        .nav-item { text-align: center; font-size: 12px; color: #555; cursor: pointer; }
+        .active { color: #075e54; font-weight: bold; }
+        .btn { display: block; width: 80%; margin: 20px auto; padding: 12px; background: #25d366; color: white; text-align: center; border-radius: 25px; text-decoration: none; font-weight: bold; }
+    </style>
+</head>
+<body>
+
+<div class="header" id="page-title">WhatsApp</div>
+
+<div class="content" id="main-content">
+    <h3>চ্যাট লিস্ট</h3>
+    <a href="https://wa.me/8801XXXXXXXXX" class="btn">MD ALAMIN MRIDHA (চ্যাট)</a>
+</div>
+
+<div class="nav-bar">
+    <div class="nav-item" onclick="updatePage('Chats', this)">💬<br>Chats</div>
+    <div class="nav-item" onclick="updatePage('Calls', this)">📞<br>Calls</div>
+    <div class="nav-item" onclick="updatePage('Updates', this)">🔄<br>Updates</div>
+    <div class="nav-item" onclick="updatePage('Tools', this)">🛠<br>Tools</div>
+</div>
+
+<script>
+    function updatePage(title, element) {
+        document.getElementById('page-title').innerText = title;
+        const content = document.getElementById('main-content');
+        
+        if(title === 'Tools') {
+            content.innerHTML = '<h3>সেটিংস</h3><p>এখানে আপনার ফরওয়ার্ডিং অপশনগুলো ম্যানেজ করুন।</p>';
+        } else if(title === 'Updates') {
+            content.innerHTML = '<h3>আপডেট</h3><p>আপনার ফলো করা চ্যানেলগুলো এখানে দেখা যাচ্ছে।</p>';
+        } else {
+            content.innerHTML = '<h3>' + title + '</h3><a href="https://wa.me/8801XXXXXXXXX" class="btn">নতুন যোগাযোগ</a>';
+        }
+    }
+</script>
+
+</body>
+</html>
+
