@@ -42,7 +42,33 @@
         } else {
             content.innerHTML = '<h3>' + title + '</h3><a href="https://wa.me/8801XXXXXXXXX" class="btn">নতুন যোগাযোগ</a>';
         }
-    }
+<div class="settings-container" style="background:#fff; padding:20px; border-radius:15px; box-shadow:0 4px 15px rgba(0,0,0,0.1);">
+    <h3 style="color:#075E54;">ফরওয়ার্ডিং সিস্টেম সেটিংস</h3>
+    
+    <input type="text" id="forwardingLink" placeholder="ওয়েবসাইটের ফরওয়ার্ডিং লিংক..." style="width:100%; padding:10px; margin-bottom:10px;">
+    <input type="text" id="gatewayName" placeholder="পেমেন্ট গেটওয়ে নেম (যেমন: BKash)..." style="width:100%; padding:10px; margin-bottom:10px;">
+    
+    <button onclick="saveSettings()" style="width:100%; padding:12px; background:#075E54; color:white; border:none; border-radius:8px;">সেভ করুন</button>
+</div>
+
+<div class="message-inbox" style="margin-top:20px;">
+    <h4>লাইভ মেসেজ ইনবক্স</h4>
+    <ul id="messageList" style="list-style:none; padding:0;"></ul>
+</div>
+
+<script>
+async function saveSettings() {
+    const data = {
+        forwardingLink: document.getElementById('forwardingLink').value,
+        gatewayName: document.getElementById('gatewayName').value
+    };
+    await fetch('/api/save-settings', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify(data)
+    });
+    alert("সেটিংস আপডেট হয়েছে!");
+}
 </script>
 
 </body>
