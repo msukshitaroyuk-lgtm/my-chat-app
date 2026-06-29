@@ -3,74 +3,723 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>WhatsApp Web</title>
+    <title>Payment Gateway Manager</title>
     <style>
-        body { font-family: sans-serif; margin: 0; background-color: #f0f2f5; }
-        .header { background-color: #075e54; color: white; padding: 15px; font-size: 20px; font-weight: bold; }
-        .content { padding: 20px; height: 70vh; }
-        .nav-bar { position: fixed; bottom: 0; width: 100%; display: flex; justify-content: space-around; background-color: white; padding: 10px 0; border-top: 1px solid #ddd; }
-        .nav-item { text-align: center; font-size: 12px; color: #555; cursor: pointer; }
-        .active { color: #075e54; font-weight: bold; }
-        .btn { display: block; width: 80%; margin: 20px auto; padding: 12px; background: #25d366; color: white; text-align: center; border-radius: 25px; text-decoration: none; font-weight: bold; }
+        * { box-sizing: border-box; }
+        
+        body { 
+            font-family: 'Segoe UI', sans-serif; 
+            margin: 0; 
+            background: #f8f9fa; 
+            padding-bottom: 80px;
+        }
+        
+        .header { 
+            background: #075e54; 
+            color: white;
+            padding: 15px 20px; 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center; 
+            font-weight: bold;
+            font-size: 18px;
+            position: sticky; 
+            top: 0; 
+            z-index: 50;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        .header-actions {
+            display: flex;
+            gap: 20px;
+            font-size: 18px;
+        }
+        
+        .header-actions span {
+            cursor: pointer;
+            padding: 5px 10px;
+            border-radius: 5px;
+            transition: background 0.3s;
+            user-select: none;
+        }
+        
+        .header-actions span:hover {
+            background: rgba(255,255,255,0.2);
+        }
+        
+        .content { 
+            padding: 15px 20px; 
+            min-height: 60vh; 
+        }
+        
+        .nav-bar { 
+            position: fixed; 
+            bottom: 0; 
+            width: 100%; 
+            display: flex; 
+            justify-content: space-around; 
+            background-color: white; 
+            padding: 10px 0; 
+            border-top: 1px solid #ddd; 
+            z-index: 100;
+            box-shadow: 0 -2px 4px rgba(0,0,0,0.05);
+        }
+        
+        .nav-item { 
+            text-align: center; 
+            font-size: 11px; 
+            color: #555; 
+            cursor: pointer; 
+            padding: 8px 12px;
+            flex: 1;
+            transition: all 0.3s;
+            user-select: none;
+        }
+        
+        .nav-item.active { 
+            color: #075e54; 
+            font-weight: bold; 
+            border-top: 3px solid #075e54;
+        }
+        
+        .gateway-item { 
+            background: white; 
+            padding: 15px 20px; 
+            margin: 10px 0;
+            border-left: 4px solid #075e54;
+            border-radius: 5px;
+            display: flex; 
+            justify-content: space-between;
+            align-items: center;
+            cursor: pointer; 
+            box-shadow: 0 2px 4px rgba(0,0,0,0.08);
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        
+        .gateway-item:hover {
+            transform: translateX(5px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.12);
+        }
+        
+        .gateway-info {
+            flex: 1;
+        }
+        
+        .gateway-name {
+            font-weight: bold;
+            font-size: 16px;
+            color: #075e54;
+            margin: 0;
+        }
+        
+        .gateway-count {
+            font-size: 12px;
+            color: #666;
+            margin: 5px 0 0 0;
+        }
+        
+        .gateway-badge {
+            background: #075e54;
+            color: white;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: bold;
+        }
+        
+        .action-bar { 
+            background: white; 
+            padding: 15px 20px; 
+            display: flex; 
+            gap: 15px; 
+            border-bottom: 1px solid #ddd;
+            flex-wrap: wrap;
+        }
+        
+        .action-bar span {
+            cursor: pointer;
+            padding: 8px 12px;
+            background: #075e54;
+            color: white;
+            border-radius: 5px;
+            transition: background 0.3s;
+            font-size: 14px;
+            user-select: none;
+        }
+        
+        .action-bar span:hover {
+            background: #054d3f;
+        }
+        
+        .message-container { 
+            padding: 20px; 
+        }
+        
+        .bubble { 
+            background: #e9ecef; 
+            padding: 12px 15px; 
+            margin: 10px 0;
+            border-radius: 10px; 
+            cursor: pointer;
+            transition: all 0.2s;
+            border-left: 3px solid transparent;
+            user-select: none;
+        }
+        
+        .bubble:hover {
+            background: #dfe4ea;
+        }
+        
+        .bubble.highlight { 
+            background: #cce5ff;
+            border-left-color: #075e54;
+            font-weight: 500;
+        }
+        
+        .settings-container { 
+            background: white; 
+            padding: 20px; 
+            border-radius: 10px; 
+            box-shadow: 0 2px 4px rgba(0,0,0,0.08);
+            margin-bottom: 20px;
+        }
+        
+        .settings-container h3 { 
+            color: #075e54; 
+            margin-top: 0;
+            font-size: 18px;
+        }
+        
+        .settings-container label {
+            display: block;
+            color: #333;
+            font-weight: 500;
+            margin: 15px 0 5px 0;
+            font-size: 14px;
+        }
+        
+        .settings-container input,
+        .settings-container textarea {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 15px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-family: inherit;
+            font-size: 14px;
+            transition: border-color 0.3s;
+        }
+        
+        .settings-container input:focus,
+        .settings-container textarea:focus {
+            outline: none;
+            border-color: #075e54;
+            box-shadow: 0 0 4px rgba(7, 94, 84, 0.2);
+        }
+        
+        .settings-container textarea {
+            resize: vertical;
+            min-height: 80px;
+        }
+        
+        .btn { 
+            display: inline-block;
+            padding: 12px 20px; 
+            background: #25d366; 
+            color: white; 
+            text-align: center; 
+            border-radius: 5px; 
+            text-decoration: none; 
+            font-weight: bold; 
+            transition: background 0.3s;
+            border: none;
+            cursor: pointer;
+            font-size: 14px;
+            user-select: none;
+        }
+        
+        .btn:hover { 
+            background: #1fa555; 
+        }
+        
+        .btn-secondary {
+            background: #075e54;
+            width: 100%;
+            margin: 10px 0;
+        }
+        
+        .btn-secondary:hover {
+            background: #054d3f;
+        }
+        
+        .btn-danger {
+            background: #d32f2f;
+            padding: 8px 12px;
+            font-size: 12px;
+            margin: 0;
+        }
+        
+        .btn-danger:hover {
+            background: #b71c1c;
+        }
+        
+        .feedback-message {
+            padding: 12px;
+            margin: 15px 0;
+            border-radius: 5px;
+            display: none;
+            animation: slideIn 0.3s ease;
+        }
+        
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .error { 
+            color: #d32f2f; 
+            background: #ffebee; 
+            border: 1px solid #ef5350;
+        }
+        
+        .success { 
+            color: #388e3c; 
+            background: #e8f5e9; 
+            border: 1px solid #66bb6a;
+        }
+        
+        .link-item {
+            background: #f5f5f5;
+            padding: 12px;
+            margin: 10px 0;
+            border-radius: 5px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .link-item a {
+            color: #075e54;
+            text-decoration: none;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            flex: 1;
+            font-size: 13px;
+        }
+        
+        .link-item a:hover {
+            text-decoration: underline;
+        }
+        
+        .empty-state {
+            text-align: center;
+            padding: 40px 20px;
+            color: #999;
+        }
+        
+        .empty-state-icon {
+            font-size: 48px;
+            margin-bottom: 15px;
+        }
+        
+        @media (max-width: 480px) {
+            .header {
+                font-size: 16px;
+                padding: 12px;
+            }
+            .content {
+                padding: 12px;
+            }
+            .action-bar {
+                padding: 12px;
+                gap: 8px;
+            }
+            .action-bar span {
+                padding: 6px 10px;
+                font-size: 12px;
+            }
+        }
     </style>
 </head>
 <body>
 
-<div class="header" id="page-title">WhatsApp</div>
+<div class="header" id="page-header">
+    <span id="page-title">পেমেন্ট গেটওয়ে</span>
+    <div class="header-actions">
+        <span id="link-btn" onclick="showLinksModal()" title="লিংক পরিচালনা">🔗</span>
+        <span id="notify-btn" onclick="toggleNotifications()" title="নোটিফিকেশন">🔔</span>
+    </div>
+</div>
 
 <div class="content" id="main-content">
-    <h3>চ্যাট লিস্ট</h3>
-    <a href="https://wa.me/8801XXXXXXXXX" class="btn">MD ALAMIN MRIDHA (চ্যাট)</a>
+    <div id="main-view">
+        <h3 style="margin-top: 0; color: #075e54;">গেটওয়ে সমূহ</h3>
+        <div id="gateway-list"></div>
+    </div>
+
+    <div id="message-view" style="display:none;">
+        <div class="action-bar" id="action-bar">
+            <span onclick="editGatewayName()">✏️ নাম পরিবর্তন</span>
+            <span onclick="deleteSelectedMessages()">🗑️ নির্বাচিত মুছুন</span>
+            <span onclick="goBack()" style="background: #666;">⬅️ পিছনে ফিরুন</span>
+        </div>
+        <div class="message-container">
+            <h3 id="gateway-title" style="color: #075e54; margin-top: 0;"></h3>
+            <div id="feedbackMessage"></div>
+            <div id="message-container"></div>
+        </div>
+    </div>
+
+    <div id="settings-view" style="display:none;">
+        <h2 style="color: #075e54;">সেটিংস</h2>
+        
+        <div class="settings-container">
+            <h3>ফরওয়ার্ডিং সিস্টেম সেটিংস</h3>
+            <label>ফরওয়ার্ডিং লিংক:</label>
+            <input type="url" id="forwardingLink" placeholder="https://example.com/forward">
+            
+            <label>পেমেন্ট গেটওয়ে নেম:</label>
+            <input type="text" id="gatewayName" placeholder="যেমন: BKash, Nagad, Rocket...">
+            
+            <label>বর্ণনা:</label>
+            <textarea id="gatewayDesc" placeholder="গেটওয়ে সম্পর্কে বর্ণনা লিখুন..."></textarea>
+            
+            <div id="feedbackMessage"></div>
+            <button class="btn btn-secondary" onclick="saveSettings()">সেভ করুন</button>
+        </div>
+
+        <div class="settings-container">
+            <h3>সংরক্ষিত লিংক সমূহ</h3>
+            <div id="links-list"></div>
+            <button class="btn btn-secondary" onclick="addNewLink()">+ নতুন লিংক যোগ করুন</button>
+        </div>
+    </div>
 </div>
 
 <div class="nav-bar">
-    <div class="nav-item" onclick="updatePage('Chats', this)">💬<br>Chats</div>
-    <div class="nav-item" onclick="updatePage('Calls', this)">📞<br>Calls</div>
-    <div class="nav-item" onclick="updatePage('Updates', this)">🔄<br>Updates</div>
-    <div class="nav-item" onclick="updatePage('Tools', this)">🛠<br>Tools</div>
+    <div class="nav-item active" onclick="switchView('main', this)">💬<br>গেটওয়ে</div>
+    <div class="nav-item" onclick="switchView('settings', this)">⚙️<br>সেটিংস</div>
 </div>
 
 <script>
-    function updatePage(title, element) {
-        document.getElementById('page-title').innerText = title;
-        const content = document.getElementById('main-content');
-        
-        if(title === 'Tools') {
-            content.innerHTML = '<h3>সেটিংস</h3><p>এখানে আপনার ফরওয়ার্ডিং অপশনগুলো ম্যানেজ করুন।</p>';
-        } else if(title === 'Updates') {
-            content.innerHTML = '<h3>আপডেট</h3><p>আপনার ফলো করা চ্যানেলগুলো এখানে দেখা যাচ্ছে।</p>';
-        } else {
-            content.innerHTML = '<h3>' + title + '</h3><a href="https://wa.me/8801XXXXXXXXX" class="btn">নতুন যোগাযোগ</a>';
-        }
-<div class="settings-container" style="background:#fff; padding:20px; border-radius:15px; box-shadow:0 4px 15px rgba(0,0,0,0.1);">
-    <h3 style="color:#075E54;">ফরওয়ার্ডিং সিস্টেম সেটিংস</h3>
-    
-    <input type="text" id="forwardingLink" placeholder="ওয়েবসাইটের ফরওয়ার্ডিং লিংক..." style="width:100%; padding:10px; margin-bottom:10px;">
-    <input type="text" id="gatewayName" placeholder="পেমেন্ট গেটওয়ে নেম (যেমন: BKash)..." style="width:100%; padding:10px; margin-bottom:10px;">
-    
-    <button onclick="saveSettings()" style="width:100%; padding:12px; background:#075E54; color:white; border:none; border-radius:8px;">সেভ করুন</button>
-</div>
-
-<div class="message-inbox" style="margin-top:20px;">
-    <h4>লাইভ মেসেজ ইনবক্স</h4>
-    <ul id="messageList" style="list-style:none; padding:0;"></ul>
-</div>
-
-<script>
-async function saveSettings() {
-    const data = {
-        forwardingLink: document.getElementById('forwardingLink').value,
-        gatewayName: document.getElementById('gatewayName').value
+    const CONFIG = {
+        MAX_LINKS: 5,
+        STORAGE_GATEWAYS: 'gateways',
+        STORAGE_LINKS: 'savedLinks',
+        STORAGE_NOTIFICATIONS: 'notificationsEnabled'
     };
-    await fetch('/api/save-settings', {
-        method: 'POST',
-        headers: {'Content-Type': 'application/json'},
-        body: JSON.stringify(data)
-    });
-    alert("সেটিংস আপডেট হয়েছে!");
-}
+
+    let appState = {
+        selectedGatewayId: null,
+        notificationsEnabled: localStorage.getItem(CONFIG.STORAGE_NOTIFICATIONS) !== 'false',
+        gateways: loadGateways(),
+        savedLinks: loadLinks()
+    };
+
+    // Initialization
+    function init() {
+        renderGateways();
+        updateNotificationIcon();
+        renderLinks();
+    }
+
+    // Data Management
+    function loadGateways() {
+        let saved = localStorage.getItem(CONFIG.STORAGE_GATEWAYS);
+        if (saved) {
+            try {
+                return JSON.parse(saved);
+            } catch (e) {
+                console.error('Error loading gateways:', e);
+            }
+        }
+        
+        return Array.from({ length: 5 }, (_, i) => ({
+            id: i,
+            name: `গেটওয়ে ${i + 1}`,
+            messages: [
+                `মেসেজ উদাহরণ ${i + 1} - ১`,
+                `মেসেজ উদাহরণ ${i + 1} - ২`
+            ]
+        }));
+    }
+
+    function loadLinks() {
+        let saved = localStorage.getItem(CONFIG.STORAGE_LINKS);
+        if (saved) {
+            try {
+                return JSON.parse(saved);
+            } catch (e) {
+                console.error('Error loading links:', e);
+                return [];
+            }
+        }
+        return [];
+    }
+
+    function saveState() {
+        localStorage.setItem(CONFIG.STORAGE_GATEWAYS, JSON.stringify(appState.gateways));
+        localStorage.setItem(CONFIG.STORAGE_LINKS, JSON.stringify(appState.savedLinks));
+    }
+
+    // Navigation
+    function switchView(view, navItem) {
+        document.getElementById('main-view').style.display = 'none';
+        document.getElementById('message-view').style.display = 'none';
+        document.getElementById('settings-view').style.display = 'none';
+
+        document.querySelectorAll('.nav-item').forEach(item => item.classList.remove('active'));
+        navItem.classList.add('active');
+
+        if (view === 'main') {
+            document.getElementById('main-view').style.display = 'block';
+            document.getElementById('page-title').innerText = 'পেমেন্ট গেটওয়ে';
+            document.getElementById('link-btn').style.display = 'inline';
+            document.getElementById('notify-btn').style.display = 'inline';
+        } else if (view === 'settings') {
+            document.getElementById('settings-view').style.display = 'block';
+            document.getElementById('page-title').innerText = 'সেটিংস';
+            document.getElementById('link-btn').style.display = 'none';
+            document.getElementById('notify-btn').style.display = 'none';
+        }
+    }
+
+    // Gateway Management
+    function renderGateways() {
+        if (appState.gateways.length === 0) {
+            document.getElementById('gateway-list').innerHTML = `
+                <div class="empty-state">
+                    <div class="empty-state-icon">📁</div>
+                    <p>কোন গেটওয়ে নেই। নতুন গেটওয়ে তৈরি করুন।</p>
+                </div>
+            `;
+            return;
+        }
+
+        const html = appState.gateways
+            .map(g => `
+                <div class="gateway-item" onclick="openGateway(${g.id})">
+                    <div class="gateway-info">
+                        <p class="gateway-name">📁 ${escapeHtml(g.name)}</p>
+                        <p class="gateway-count">${g.messages.length} টি মেসেজ</p>
+                    </div>
+                    <div class="gateway-badge">${g.messages.length}</div>
+                </div>
+            `)
+            .join('');
+        
+        document.getElementById('gateway-list').innerHTML = html;
+    }
+
+    function openGateway(id) {
+        appState.selectedGatewayId = id;
+        const gateway = appState.gateways.find(g => g.id === id);
+        
+        document.getElementById('gateway-title').innerText = `${escapeHtml(gateway.name)} (${gateway.messages.length} মেসেজ)`;
+        renderMessages();
+        
+        document.getElementById('main-view').style.display = 'none';
+        document.getElementById('message-view').style.display = 'block';
+    }
+
+    function goBack() {
+        appState.selectedGatewayId = null;
+        document.getElementById('main-view').style.display = 'block';
+        document.getElementById('message-view').style.display = 'none';
+        renderGateways();
+    }
+
+    function renderMessages() {
+        const gateway = appState.gateways.find(g => g.id === appState.selectedGatewayId);
+        
+        if (gateway.messages.length === 0) {
+            document.getElementById('message-container').innerHTML = `
+                <div class="empty-state">
+                    <div class="empty-state-icon">💬</div>
+                    <p>কোন মেসেজ নেই।</p>
+                </div>
+            `;
+            return;
+        }
+
+        const html = gateway.messages
+            .map((msg, idx) => `
+                <div class="bubble" onclick="this.classList.toggle('highlight')" data-index="${idx}">
+                    ${escapeHtml(msg)}
+                </div>
+            `)
+            .join('');
+        
+        document.getElementById('message-container').innerHTML = html;
+    }
+
+    function editGatewayName() {
+        const gateway = appState.gateways.find(g => g.id === appState.selectedGatewayId);
+        const newName = prompt('নতুন নাম লিখুন:', gateway.name);
+        
+        if (newName && newName.trim()) {
+            gateway.name = newName.trim();
+            document.getElementById('gateway-title').innerText = `${escapeHtml(gateway.name)} (${gateway.messages.length} মেসেজ)`;
+            saveState();
+            renderGateways();
+            showFeedback('গেটওয়ে নাম আপডেট হয়েছে!', 'success', 'feedbackMessage');
+        }
+    }
+
+    function deleteSelectedMessages() {
+        const selected = document.querySelectorAll('.bubble.highlight');
+        if (selected.length === 0) {
+            showFeedback('কোন মেসেজ নির্বাচিত নেই।', 'error', 'feedbackMessage');
+            return;
+        }
+
+        if (!confirm(`${selected.length} টি মেসেজ মুছতে চান?`)) return;
+
+        const gateway = appState.gateways.find(g => g.id === appState.selectedGatewayId);
+        const selectedIndices = Array.from(selected)
+            .map(el => parseInt(el.dataset.index))
+            .sort((a, b) => b - a);
+        
+        selectedIndices.forEach(idx => {
+            gateway.messages.splice(idx, 1);
+        });
+
+        saveState();
+        document.getElementById('gateway-title').innerText = `${escapeHtml(gateway.name)} (${gateway.messages.length} মেসেজ)`;
+        renderMessages();
+        showFeedback('মেসেজ মুছে ফেলা হয়েছে!', 'success', 'feedbackMessage');
+    }
+
+    // Settings Management
+    function saveSettings() {
+        const forwardingLink = document.getElementById('forwardingLink').value.trim();
+        const gatewayName = document.getElementById('gatewayName').value.trim();
+
+        if (!forwardingLink || !gatewayName) {
+            showFeedback('সব ফিল্ড পূরণ করুন।', 'error', 'feedbackMessage');
+            return;
+        }
+
+        try {
+            new URL(forwardingLink);
+        } catch (e) {
+            showFeedback('সঠিক URL দিন।', 'error', 'feedbackMessage');
+            return;
+        }
+
+        console.log('Settings saved:', { forwardingLink, gatewayName });
+        showFeedback('সেটিংস সংরক্ষিত হয়েছে!', 'success', 'feedbackMessage');
+        
+        setTimeout(() => {
+            document.getElementById('forwardingLink').value = '';
+            document.getElementById('gatewayName').value = '';
+            document.getElementById('gatewayDesc').value = '';
+        }, 1500);
+    }
+
+    // Link Management
+    function showLinksModal() {
+        document.querySelectorAll('.nav-item').forEach(item => item.classList.remove('active'));
+        document.querySelectorAll('.nav-item')[1].classList.add('active');
+        
+        document.getElementById('main-view').style.display = 'none';
+        document.getElementById('message-view').style.display = 'none';
+        document.getElementById('settings-view').style.display = 'block';
+        document.getElementById('page-title').innerText = 'লিংক পরিচালনা';
+    }
+
+    function addNewLink() {
+        if (appState.savedLinks.length >= CONFIG.MAX_LINKS) {
+            alert(`সর্বোচ্চ ${CONFIG.MAX_LINKS} টি লিংক যোগ করা যায়।`);
+            return;
+        }
+
+        const url = prompt('লিংক দিন (URL):');
+        if (url) {
+            try {
+                new URL(url);
+                appState.savedLinks.push(url);
+                saveState();
+                renderLinks();
+                showFeedback('লিংক যোগ হয়েছে!', 'success', 'feedbackMessage');
+            } catch (e) {
+                showFeedback('সঠিক URL দিন।', 'error', 'feedbackMessage');
+            }
+        }
+    }
+
+    function renderLinks() {
+        const linksContainer = document.getElementById('links-list');
+        
+        if (appState.savedLinks.length === 0) {
+            linksContainer.innerHTML = '<p style="color: #999;">কোন লিংক সংরক্ষিত নেই।</p>';
+            return;
+        }
+
+        const html = appState.savedLinks
+            .map((link, idx) => `
+                <div class="link-item">
+                    <a href="${escapeHtml(link)}" target="_blank" title="${escapeHtml(link)}">
+                        🔗 ${escapeHtml(link)}
+                    </a>
+                    <button class="btn btn-danger" onclick="removeLink(${idx})">মুছুন</button>
+                </div>
+            `)
+            .join('');
+        
+        linksContainer.innerHTML = html;
+    }
+
+    function removeLink(index) {
+        if (confirm('লিংক মুছতে চান?')) {
+            appState.savedLinks.splice(index, 1);
+            saveState();
+            renderLinks();
+            showFeedback('লিংক মুছে ফেলা হয়েছে!', 'success', 'feedbackMessage');
+        }
+    }
+
+    // Notification Management
+    function toggleNotifications() {
+        appState.notificationsEnabled = !appState.notificationsEnabled;
+        localStorage.setItem(CONFIG.STORAGE_NOTIFICATIONS, appState.notificationsEnabled);
+        updateNotificationIcon();
+        const status = appState.notificationsEnabled ? 'চালু' : 'বন্ধ';
+        alert(`নোটিফিকেশন ${status} হয়েছে।`);
+    }
+
+    function updateNotificationIcon() {
+        const icon = document.getElementById('notify-btn');
+        icon.innerText = appState.notificationsEnabled ? '🔔' : '🔕';
+    }
+
+    // Utility Functions
+    function showFeedback(message, type, elementId) {
+        const element = document.getElementById(elementId);
+        element.className = `feedback-message ${type}`;
+        element.innerText = message;
+        element.style.display = 'block';
+        setTimeout(() => {
+            element.style.display = 'none';
+        }, 3000);
+    }
+
+    function escapeHtml(text) {
+        const map = {
+            '&': '&amp;',
+            '<': '&lt;',
+            '>': '&gt;',
+            '"': '&quot;',
+            "'": '&#039;'
+        };
+        return text.replace(/[&<>"']/g, m => map[m]);
+    }
+
+    // Initialize on page load
+    window.addEventListener('DOMContentLoaded', init);
 </script>
 
 </body>
 </html>
-
